@@ -1,0 +1,10 @@
+# Kaggle CSVs are large - download them yourself (see README)
+data/raw/*
+!data/raw/.gitkeep
+__pycache__/
+.pytest_cache/
+.venv/
+models/
+
+# stray copies of the data outside data/raw
+data/*.csv
