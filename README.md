@@ -1,10 +1,7 @@
-# 💳 Credit Card Fraud Detection: SQL Features, Rules & ML
+# Credit Card Fraud Detection: SQL Features, Rules & ML
 
 ![CI](https://github.com/bairipoojitha1299/card-fraud-detection/actions/workflows/ci.yml/badge.svg)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?logo=postgresql&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?logo=scikitlearn&logoColor=white)
-![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white)
+**Tech:** PostgreSQL · Python · scikit-learn · Streamlit
 
 This project detects fraudulent card transactions across **1.85 million transactions** from 999 cards. It follows the workflow a bank's fraud analytics team uses:
 
@@ -18,7 +15,7 @@ This project detects fraudulent card transactions across **1.85 million transact
 
 ---
 
-## 🔑 Results (test period: Jun–Dec 2020, never seen in training)
+## Results (test period: Jun–Dec 2020, never seen in training)
 
 | Approach | Alerts to review | Precision | Fraud cases caught | Fraud $ caught |
 |---|---:|---:|---:|---:|
@@ -30,9 +27,9 @@ This project detects fraudulent card transactions across **1.85 million transact
 - At an assumed **\$5 review cost per alert**, the best threshold (0.25) stops **99.6% of the \$1.13M** in fraud losses for \$20.5k of review effort, a **net saving of \$1.11M**. Savings stay flat between 0.2 and 0.7, so in practice the threshold can be set by **analyst capacity**.
 - The gradient-boosting model reaches **PR-AUC 0.97**, compared with **0.33** for the linear baseline. Fraud here depends on combinations of signals (e.g. *large* **and** *at night* **and** *in an online category*), which a linear model can't capture.
 
-> ⚠️ **Honest caveat:** the data is **simulated** (generated with the Sparkov tool), so fraud patterns are cleaner than in real banking data and the scores are higher than a production system would see. The *method* (leak-free features, time-based split, cost-based thresholding) is what carries over.
+> **Note:** the data is **simulated** (generated with the Sparkov tool), so fraud patterns are cleaner than in real banking data and the scores are higher than a production system would see. The *method* (leak-free features, time-based split, cost-based thresholding) is what carries over.
 
-## 🔍 What fraud looks like in this data
+## What fraud looks like in this data
 
 - **Fraud happens at night.** 10pm–4am accounts for 23% of transactions but **85% of fraud**. At 10–11pm the fraud rate is about 2.6%, versus about 0.1% during the day.
 - **Fraud is large.** The average fraud transaction is **\$531**, against \$68 for a normal one. Fraud rate rises from 0.2% under \$50 to **21–22% above \$500**.
@@ -46,7 +43,7 @@ This project detects fraudulent card transactions across **1.85 million transact
 
 ![Feature importance](images/05_feature_importance.png)
 
-## 🧮 Feature engineering in SQL ([`sql/03_features.sql`](sql/03_features.sql))
+## Feature engineering in SQL ([`sql/03_features.sql`](sql/03_features.sql))
 
 All card-history features use **only past transactions**. Window frames look backwards, so there is **no data leakage**: each transaction is scored with exactly what a live system would know at that moment.
 
@@ -62,7 +59,7 @@ All card-history features use **only past transactions**. Window frames look bac
 
 These features are verified by SQL integration tests on a hand-made card history where every expected value is known ([`tests/test_features_sql.py`](tests/test_features_sql.py)).
 
-## 🚦 Rules vs model
+## Rules vs model
 
 | Rule ([`sql/04_rules.sql`](sql/04_rules.sql)) | Alerts | Precision | Recall |
 |---|---:|---:|---:|
@@ -73,14 +70,14 @@ These features are verified by SQL integration tests on a hand-made card history
 
 Rules are easy to explain, but each one either misses fraud or floods the queue. The model combines the same signals and ranks transactions by risk. The dashboard's alert queue still shows **which rules fired for each alert**, so decisions stay explainable.
 
-## 🧠 Modelling choices
+## Modelling choices
 
 - **Time-based split.** The model trains on Jan 2019 – Jun 2020 and is tested on Jun – Dec 2020, which mimics deployment. A random split would leak future behaviour into training.
 - **Class imbalance (0.5% fraud)** is handled with `class_weight="balanced"`, and models are judged on **PR-AUC**. ROC-AUC looks great for almost any model on imbalanced data.
 - **Threshold chosen by money:** net savings = fraud \$ stopped − alerts × review cost.
 - **Permutation importance** on held-out data shows what the model actually relies on: category-relative amount, 24h spend and amount.
 
-## 📊 Dashboard ([`app/streamlit_app.py`](app/streamlit_app.py))
+## Dashboard ([`app/streamlit_app.py`](app/streamlit_app.py))
 
 The dashboard has three tabs:
 
@@ -113,7 +110,7 @@ streamlit run app/streamlit_app.py
    This loads the CSVs, builds the features and rules, trains and evaluates the models, and writes `outputs/` and `images/`. It takes about 2 minutes.
 4. Run the tests with `pytest`.
 
-## 📁 Structure
+## Structure
 
 ```
 card-fraud-detection/
@@ -133,6 +130,6 @@ card-fraud-detection/
 └── .github/workflows/ci.yml   # tests + dashboard smoke test on every push
 ```
 
-## 📚 Data
+## Data
 
 [Credit Card Transactions Fraud Detection Dataset](https://www.kaggle.com/datasets/kartik2112/fraud-detection) on Kaggle. These are simulated transactions for about 1,000 customers from Jan 2019 to Dec 2020. Customer names and street addresses are dropped when the data is loaded.
